@@ -1,21 +1,17 @@
 from .base_page import BasePage
-from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoAlertPresentException
+from selenium.webdriver.support.ui import WebDriverWait
 from .locators import ProductPageLocators
 import math
+import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 
 
 class ProductPage(BasePage):
-    def __init__(self, browser, url):
-        self.browser = browser
-        self.url = url
-
-    def open(self):
-        self.browser.get(self.url)
-
     def should_be_login_url(self):
         login_url = self.browser.current_url
-        assert "?promo=newYear" in login_url, "Not a promo page"
+        assert "?promo=offer" in login_url, "Not a promo page"
         assert True
 
     def add_to_basket(self):
@@ -37,7 +33,11 @@ class ProductPage(BasePage):
             print("No second alert presented")
 
     def check_added_to_basket(self):
-        assert self.browser.find_element(*ProductPageLocators.BASKET_BOOK_ADDED).text in self.browser.find_element(
-            *ProductPageLocators.PAGE_BOOK_NAME).text, "Wrong book added"
-        assert self.browser.find_element(*ProductPageLocators.BASKET_PRICE_ADDED).text in self.browser.find_element(
-            *ProductPageLocators.PAGE_PRICE_COST).text.split()[-1], "Wrong basket price"
+        basket_book_added = self.browser.find_element(*ProductPageLocators.BASKET_BOOK_ADDED).text
+        page_book_name = self.browser.find_element(*ProductPageLocators.PAGE_BOOK_NAME).text
+        print(f"Book names: {basket_book_added} and {page_book_name}")
+        basket_price_added = self.browser.find_element(*ProductPageLocators.BASKET_PRICE_ADDED).text
+        page_price_cost = self.browser.find_element(*ProductPageLocators.PAGE_PRICE_COST).text.split()[-1]
+        print(f"Book price: {basket_price_added} and {page_price_cost}")
+        assert basket_book_added == page_book_name, "Wrong book added"
+        assert basket_price_added == page_price_cost, "Wrong basket price"
